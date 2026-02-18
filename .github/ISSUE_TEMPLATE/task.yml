@@ -35,7 +35,6 @@ body:
         - Input: Node adjacency matrix
         - Parameter: Alpha coefficient for cost weighting
         - Objective: Minimize $Cost$
-    render: markdown
 
   - type: textarea
     id: dod
