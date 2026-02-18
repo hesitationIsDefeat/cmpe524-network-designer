@@ -1,0 +1,50 @@
+name: Network Optimizer Task
+description: Logic, Parameters, and Topology Work
+title: "[Task]: "
+labels: ["logic"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Project Component
+      options:
+        - 🌐 Network Input / Parsing (Serde)
+        - ⚙️ System Parameters / Config
+        - 🧮 Objective Function Logic
+        - 📉 Optimization Algorithm
+        - 📤 Output / Export (JSON/CSV)
+        - 🧪 Benchmarking / Profiling
+    validations:
+      required: true
+
+  - type: textarea
+    id: task_goal
+    attributes:
+      label: Task Goal
+      description: What is the specific optimization or input requirement?
+      placeholder: Implement the latency constraint for the objective function...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logic_details
+    attributes:
+      label: Logic & Parameters
+      description: Describe the network inputs or system parameters being added.
+      placeholder: |
+        - Input: Node adjacency matrix
+        - Parameter: Alpha coefficient for cost weighting
+        - Objective: Minimize $Cost$
+    render: markdown
+
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of Done
+      description: Checklist for completion
+      value: |
+        - [ ] Core logic implemented in `.rs`
+        - [ ] `cargo clippy` runs without warnings
+        - [ ] Unit tests for "best" topology output are passing
+        - [ ] Documentation for objective function updated
+        - [ ] `cargo fmt` applied
