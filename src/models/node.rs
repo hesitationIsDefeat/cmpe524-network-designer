@@ -1,3 +1,5 @@
+//! This file contains the required structures and relevant unit tests for the node of a network.
+
 #[derive(Debug, Clone, PartialEq)]
 /// Represents the type of a Node
 pub enum NodeType {
