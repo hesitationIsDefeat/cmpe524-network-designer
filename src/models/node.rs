@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn test_node_comparison() {
         let first_node = Node::new(0, NodeType::ROUTER, 10.0);
-        let second_node = Node::new(0, NodeType::ROUTER, 20.0);
+        let second_node = Node::new(1, NodeType::ROUTER, 20.0);
 
         assert!(first_node.id < second_node.id);
         assert_eq!(first_node.node_type, second_node.node_type);
