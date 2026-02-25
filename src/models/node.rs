@@ -8,3 +8,13 @@ pub struct Node {
     pub node_type: NodeType,
     pub capacity: f64,
 }
+
+impl Node {
+    pub fn new(id: usize, node_type: NodeType, capacity: f64) -> Self {
+        Self {
+            id,
+            node_type,
+            capacity,
+        }
+    }
+}
