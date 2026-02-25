@@ -1,15 +1,27 @@
 #[derive(Debug, Clone, PartialEq)]
+/// Represents the type of a Node
 pub enum NodeType {
+    /// Layer 3 device
     ROUTER,
 }
-
+/// Represents the basic unit in network topology
 pub struct Node {
+    /// Unique identifier
     pub id: usize,
+    /// Type (e.g. ROUTER)
     pub node_type: NodeType,
+    /// Maximum work capacity, the unit depends on the network type (e.g. Gbps, pps, tpm)
     pub capacity: f64,
 }
 
 impl Node {
+    /// Creates a Node with specific parameters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let node = Node::new(0, NodeType::ROUTER, 10.0);
+    /// ```
     pub fn new(id: usize, node_type: NodeType, capacity: f64) -> Self {
         Self {
             id,
