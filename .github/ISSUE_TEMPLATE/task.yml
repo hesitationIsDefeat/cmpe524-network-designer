@@ -44,6 +44,6 @@ body:
       value: |
         - [ ] Core logic implemented in `.rs`
         - [ ] `cargo clippy` runs without warnings
-        - [ ] Unit tests for "best" topology output are passing
-        - [ ] Documentation for objective function updated
+        - [ ] Unit tests are passing
+        - [ ] Documentation updated
         - [ ] `cargo fmt` applied
