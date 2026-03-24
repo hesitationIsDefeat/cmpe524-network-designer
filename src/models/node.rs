@@ -22,7 +22,7 @@ impl Node {
     /// # Examples
     ///
     /// ```
-    /// use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
     /// let node = Node::new(0, NodeType::ROUTER, 10.0);
     /// ```
     pub fn new(id: usize, node_type: NodeType, capacity: f64) -> Self {
