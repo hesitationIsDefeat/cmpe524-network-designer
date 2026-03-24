@@ -26,7 +26,7 @@ impl Link {
     /// # Examples
     ///
     /// ```
-    /// use cmpe524_network_designer::models::link::{Link, LinkType};
+    /// # use cmpe524_network_designer::models::link::{Link, LinkType};
     /// let link = Link::new(0, LinkType::ETHERNET, 10.0, 5.0);
     /// ```
     pub fn new(id: usize, link_type: LinkType, capacity: f64, cost: f64) -> Self {
