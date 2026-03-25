@@ -48,9 +48,9 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
     /// let mut network = Network::new();
-    /// let node = Node::new(1, NodeType::ROUTER, 100.0);
+    /// let node = Node::new(1, NodeType::ROUTER, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,});
     ///
     /// let node_index = network.add_node(node);
     ///
@@ -69,11 +69,11 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
     /// let mut network = Network::new();
-    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 100.0));
-    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 100.0));
+    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
+    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     ///
     /// network.add_link(a, b, Link::new(1, LinkType::WIRELESS, 100.0, 50.0));
     /// assert_eq!(network.graph.edge_count(), 1);
@@ -91,11 +91,11 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
     /// let mut network = Network::new();
-    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 10.0));
-    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 10.0));
+    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
+    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     ///
     /// network.add_link(a, b, Link::new(1, LinkType::WIRELESS, 100.0, 50.5));
     /// assert_eq!(network.total_link_cost(), 50.5);
@@ -114,11 +114,11 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
     /// let mut network = Network::new();
-    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 10.0));
-    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 10.0));
+    /// let a = network.add_node(Node::new(1, NodeType::ROUTER, 10.0, Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
+    /// let b = network.add_node(Node::new(2, NodeType::ROUTER, 10.0, Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     ///
     /// // Initially disconnected
     /// assert!(!network.is_fully_connected());
@@ -141,11 +141,25 @@ impl Network {
 mod tests {
     use super::*;
     use crate::models::link::{Link, LinkType};
-    use crate::models::node::{Node, NodeType};
+    use crate::models::node::{Node, NodeType, Point3D};
 
     // Helper function to create a dummy node
     fn mock_node(id: usize) -> Node {
-        Node::new(id, NodeType::ROUTER, 100.0)
+        Node::new(
+            id,
+            NodeType::ROUTER,
+            100.0,
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 1.0,
+                y: 1.0,
+                z: 0.0,
+            },
+        )
     }
 
     fn mock_link(id: usize, capacity: f64, cost: f64) -> Link {
