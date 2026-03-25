@@ -2,12 +2,13 @@
 
 use crate::models::link::Link;
 use crate::models::node::Node;
-use petgraph::graph::{Graph, NodeIndex};
+use petgraph::graph::NodeIndex;
+use petgraph::stable_graph::StableGraph;
 
 /// Represents network topology
 pub struct Network {
     /// Undirected graph with Node instances as nodes and Link instances as edges
-    pub graph: Graph<Node, Link, petgraph::Undirected>,
+    pub graph: StableGraph<Node, Link, petgraph::Undirected>,
 }
 
 impl Network {
@@ -21,7 +22,21 @@ impl Network {
     /// ```
     pub fn new() -> Self {
         Self {
-            graph: Graph::new_undirected(),
+            graph: StableGraph::default(),
+        }
+    }
+
+    /// Creates a Network with specific capacity parameters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use cmpe524_network_designer::models::network::Network;
+    /// let network = Network::with_capacity(20, 40);
+    /// ```
+    pub fn with_capacity(node_capacity: usize, link_capacity: usize) -> Self {
+        Self {
+            graph: StableGraph::with_capacity(node_capacity, link_capacity),
         }
     }
 
@@ -113,7 +128,12 @@ impl Network {
     /// assert!(network.is_fully_connected());
     /// ```
     pub fn is_fully_connected(&self) -> bool {
-        petgraph::algo::connected_components(&self.graph) <= 1
+        if self.graph.node_count() == 0 {
+            return false;
+        }
+
+        let components = petgraph::algo::tarjan_scc(&self.graph);
+        components.len() == 1
     }
 }
 
@@ -135,6 +155,19 @@ mod tests {
     #[test]
     fn test_network_creation_and_linking() {
         let mut network = Network::new();
+        let r1 = network.add_node(mock_node(1));
+        let r2 = network.add_node(mock_node(2));
+
+        network.add_link(r1, r2, mock_link(1, 100.0, 50.0));
+
+        assert_eq!(network.graph.node_count(), 2);
+        assert_eq!(network.graph.edge_count(), 1);
+    }
+
+    #[test]
+    fn test_network_with_capacity() {
+        let mut network = Network::with_capacity(2, 1);
+
         let r1 = network.add_node(mock_node(1));
         let r2 = network.add_node(mock_node(2));
 
