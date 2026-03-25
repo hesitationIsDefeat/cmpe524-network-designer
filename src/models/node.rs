@@ -3,8 +3,10 @@
 #[derive(Debug, Clone, PartialEq)]
 /// Represents the type of a Node
 pub enum NodeType {
-    /// Layer 3 device
-    ROUTER,
+    /// UAV (server) node
+    UAV,
+    /// User (client) node
+    USER,
 }
 
 /// Represents a point or a vector
@@ -21,7 +23,7 @@ pub struct Point3D {
 pub struct Node {
     /// Unique identifier
     pub id: usize,
-    /// Type (e.g. ROUTER)
+    /// Type (e.g. UAV)
     pub node_type: NodeType,
     /// Maximum work capacity, the unit depends on the network type (e.g. Gbps, pps, tpm)
     pub capacity: f64,
@@ -38,7 +40,7 @@ impl Node {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
-    /// let node = Node::new(0, NodeType::ROUTER, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,});
+    /// let node = Node::new(0, NodeType::UAV, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,});
     /// ```
     pub fn new(
         id: usize,
@@ -65,7 +67,7 @@ mod tests {
     fn test_node_creation() {
         let node = Node::new(
             0,
-            NodeType::ROUTER,
+            NodeType::UAV,
             10.0,
             Point3D {
                 x: 0.0,
@@ -80,7 +82,7 @@ mod tests {
         );
 
         assert_eq!(node.id, 0);
-        assert_eq!(node.node_type, NodeType::ROUTER);
+        assert_eq!(node.node_type, NodeType::UAV);
         assert_eq!(node.capacity, 10.0);
     }
 
@@ -88,7 +90,7 @@ mod tests {
     fn test_node_comparison() {
         let first_node = Node::new(
             0,
-            NodeType::ROUTER,
+            NodeType::UAV,
             10.0,
             Point3D {
                 x: 0.0,
@@ -103,7 +105,7 @@ mod tests {
         );
         let second_node = Node::new(
             1,
-            NodeType::ROUTER,
+            NodeType::UAV,
             20.0,
             Point3D {
                 x: 1.0,
