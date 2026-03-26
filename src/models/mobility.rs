@@ -1,15 +1,62 @@
+//! This module provides algorithms and structures for simulating user and UAV mobility.
 use crate::models::geo::{Bounds3D, Point3D};
 
 use rand::Rng;
 
+/// Defines the movement pattern a specific user or UAV will follow during the simulation.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PositionUpdateType {
+    /// This is a random movement pattern, scaled by velocity.
     RANDOM,
+    /// This is a directional movement pattern, either on the X or the Y axis.
     DIRECTIONAL,
 }
+/// A utility struct responsible for generating physical movement paths over time.
 pub struct MobilityGenerator;
 
 impl MobilityGenerator {
+    /// Generates a list of geographic positions over time for multiple entities.
+    ///
+    /// This function orchestrates the movement simulation. It calculates the required
+    /// number of steps based on the simulation duration and interval, and applies the
+    /// appropriate movement algorithm to each entity.
+    ///
+    /// # Arguments
+    ///
+    /// * `start_time` - The starting time of the simulation (in seconds).
+    /// * `end_time` - The ending time of the simulation (in seconds).
+    /// * `update_interval` - The time between each movement step (in seconds).
+    /// * `initial_positions` - A slice of starting coordinates for each entity.
+    /// * `velocities` - A slice of maximum velocities (per second) for each entity.
+    /// * `update_types` - A slice defining the movement pattern for each entity.
+    /// * `bounds` - The physical boundaries of the simulation space.
+    ///
+    /// # Returns
+    ///
+    /// A vector containing one vector per entity. The inner vector contains the `Point3D`
+    /// locations representing the entity's path. The length of the inner vector will be
+    /// `((end_time - start_time) / update_interval) + 1` (to include the initial position).
+    ///
+    /// /// # Examples
+    ///
+    /// ```
+    /// # use cmpe524_network_designer::models::geo::{Bounds3D, Point3D};
+    /// # use cmpe524_network_designer::models::mobility::{MobilityGenerator, PositionUpdateType};
+    /// // 1. Setup simulation parameters
+    /// let bounds = Bounds3D { min_x: 0.0, max_x: 100.0, min_y: 0.0, max_y: 100.0, min_z: 0.0, max_z: 50.0 };
+    /// let initial_pos = vec![Point3D { x: 50.0, y: 50.0, z: 25.0 }];
+    /// let velocities = vec![Point3D { x: 5.0, y: 5.0, z: 0.0 }];
+    /// let movement_types = vec![PositionUpdateType::RANDOM];
+    ///
+    /// // 2. Generate a 10-second path with updates every 2 seconds
+    /// let paths = MobilityGenerator::generate_locations(
+    ///     0.0, 10.0, 2.0, &initial_pos, &velocities, &movement_types, &bounds
+    /// );
+    ///
+    /// // 3. Verify the output
+    /// assert_eq!(paths.len(), 1); // 1 user path generated
+    /// assert_eq!(paths[0].len(), 6); // 1 initial position + 5 movement steps
+    /// ```
     pub fn generate_locations(
         start_time: f64,
         end_time: f64,
@@ -50,6 +97,10 @@ impl MobilityGenerator {
         all_user_paths
     }
 
+    /// Calculates the next position using a random 3D walk.
+    ///
+    /// A random multiplier between -1.0 and 1.0 is applied to the velocity
+    /// on all three axes (X, Y, and Z).
     fn calculate_random_step(current: &Point3D, velocity: &Point3D, dt: f64) -> Point3D {
         let mut rng = rand::thread_rng();
 
@@ -64,6 +115,10 @@ impl MobilityGenerator {
         }
     }
 
+    /// Calculates the next position moving strictly along the X or Y axis.
+    ///
+    /// There is a 50% chance to move along the X-axis and a 50% chance to move
+    /// along the Y-axis. The Z-axis (altitude) is never modified.
     fn calculate_directional_step(current: &Point3D, velocity: &Point3D, dt: f64) -> Point3D {
         let mut rng = rand::thread_rng();
 
@@ -79,6 +134,10 @@ impl MobilityGenerator {
         new_pos
     }
 
+    /// Constrains a geographic point to strictly remain inside the simulation boundaries.
+    ///
+    /// If a point falls outside the defined `Bounds3D`, it is forced to the nearest
+    /// edge of the boundary box using Rust's built-in `clamp` functionality.
     fn clamp_to_bounds(point: &Point3D, bounds: &Bounds3D) -> Point3D {
         Point3D {
             x: point.x.clamp(bounds.min_x, bounds.max_x),
