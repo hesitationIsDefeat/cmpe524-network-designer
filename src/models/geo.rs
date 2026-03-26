@@ -10,3 +10,13 @@ pub struct Point3D {
     /// Z-axis value
     pub z: f64,
 }
+
+impl Point3D {
+    /// Calculates the 3D Euclidean distance between this point and another.
+    pub fn distance_to(&self, other: &Point3D) -> f64 {
+        let dx = self.x - other.x;
+        let dy = self.y - other.y;
+        let dz = self.z - other.z;
+        (dx * dx + dy * dy + dz * dz).sqrt()
+    }
+}
