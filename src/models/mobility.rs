@@ -87,3 +87,190 @@ impl MobilityGenerator {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::geo::{Bounds3D, Point3D};
+
+    // Helper to generate a standard test boundary
+    fn mock_bounds() -> Bounds3D {
+        Bounds3D {
+            min_x: 0.0,
+            max_x: 100.0,
+            min_y: 0.0,
+            max_y: 100.0,
+            min_z: 0.0,
+            max_z: 50.0,
+        }
+    }
+
+    #[test]
+    fn test_clamp_to_bounds() {
+        let bounds = mock_bounds();
+
+        // Point entirely inside bounds should not change
+        let valid_point = Point3D {
+            x: 50.0,
+            y: 50.0,
+            z: 25.0,
+        };
+        assert_eq!(
+            MobilityGenerator::clamp_to_bounds(&valid_point, &bounds),
+            valid_point
+        );
+
+        // Point out of bounds should be forced to the exact boundary edge
+        let out_of_bounds = Point3D {
+            x: -10.0,
+            y: 150.0,
+            z: 60.0,
+        };
+        let clamped = MobilityGenerator::clamp_to_bounds(&out_of_bounds, &bounds);
+
+        assert_eq!(clamped.x, 0.0); // Clamped to min_x
+        assert_eq!(clamped.y, 100.0); // Clamped to max_y
+        assert_eq!(clamped.z, 50.0); // Clamped to max_z
+    }
+
+    #[test]
+    fn test_generate_locations_step_count() {
+        let bounds = mock_bounds();
+        let initial = vec![Point3D {
+            x: 50.0,
+            y: 50.0,
+            z: 25.0,
+        }];
+        let velocities = vec![Point3D {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        }];
+        let types = vec![PositionUpdateType::RANDOM];
+
+        // 10 seconds total, 2 second interval = 5 generated steps.
+        // Total path length should be 6 (Initial + 5 steps).
+        let paths = MobilityGenerator::generate_locations(
+            0.0,
+            10.0,
+            2.0,
+            &initial,
+            &velocities,
+            &types,
+            &bounds,
+        );
+
+        assert_eq!(paths.len(), 1, "Should generate paths for exactly 1 user");
+        assert_eq!(
+            paths[0].len(),
+            6,
+            "Path length should be (duration / interval) + 1"
+        );
+    }
+
+    #[test]
+    fn test_zero_velocity_means_no_movement() {
+        let bounds = mock_bounds();
+        let start_pos = Point3D {
+            x: 50.0,
+            y: 50.0,
+            z: 25.0,
+        };
+
+        let initial = vec![start_pos];
+        // Velocity is strictly zero
+        let velocities = vec![Point3D {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }];
+
+        // Test both update types
+        let paths_random = MobilityGenerator::generate_locations(
+            0.0,
+            10.0,
+            1.0,
+            &initial,
+            &velocities,
+            &vec![PositionUpdateType::RANDOM],
+            &bounds,
+        );
+        let paths_directional = MobilityGenerator::generate_locations(
+            0.0,
+            10.0,
+            1.0,
+            &initial,
+            &velocities,
+            &vec![PositionUpdateType::DIRECTIONAL],
+            &bounds,
+        );
+
+        // Every point in the path should be exactly the initial position
+        assert!(paths_random[0].iter().all(|&p| p == start_pos));
+        assert!(paths_directional[0].iter().all(|&p| p == start_pos));
+    }
+
+    #[test]
+    fn test_directional_step_preserves_z_axis() {
+        let initial = Point3D {
+            x: 50.0,
+            y: 50.0,
+            z: 25.0,
+        };
+        let velocity = Point3D {
+            x: 10.0,
+            y: 10.0,
+            z: 10.0,
+        }; // Note: Z velocity exists
+
+        let next_step = MobilityGenerator::calculate_directional_step(&initial, &velocity, 1.0);
+
+        // According to your logic, DIRECTIONAL only moves X or Y, never Z.
+        assert_eq!(
+            next_step.z, 25.0,
+            "Z axis should remain unchanged during DIRECTIONAL updates"
+        );
+
+        // We also know it must have moved exactly velocity * dt on either X or Y, but not both.
+        let x_changed = next_step.x != initial.x;
+        let y_changed = next_step.y != initial.y;
+
+        assert!(
+            x_changed ^ y_changed,
+            "It should move on exactly one axis (XOR)"
+        );
+    }
+
+    #[test]
+    fn test_bounds_are_never_exceeded() {
+        let bounds = mock_bounds();
+        let initial = vec![Point3D {
+            x: 50.0,
+            y: 50.0,
+            z: 25.0,
+        }];
+        // Extreme velocity to ensure it tries to break the bounds on every tick
+        let velocities = vec![Point3D {
+            x: 9999.0,
+            y: 9999.0,
+            z: 9999.0,
+        }];
+        let types = vec![PositionUpdateType::RANDOM];
+
+        let paths = MobilityGenerator::generate_locations(
+            0.0,
+            100.0,
+            1.0,
+            &initial,
+            &velocities,
+            &types,
+            &bounds,
+        );
+
+        for point in &paths[0] {
+            assert!(point.x >= bounds.min_x && point.x <= bounds.max_x);
+            assert!(point.y >= bounds.min_y && point.y <= bounds.max_y);
+            assert!(point.z >= bounds.min_z && point.z <= bounds.max_z);
+        }
+    }
+}
