@@ -20,3 +20,20 @@ impl Point3D {
         (dx * dx + dy * dy + dz * dz).sqrt()
     }
 }
+
+/// Represents bounds of a 3D area
+#[derive(Debug, Clone, Copy)]
+pub struct Bounds3D {
+    // X-axis lower bound
+    pub min_x: f64,
+    // X-axis upper bound
+    pub max_x: f64,
+    // Y-axis lower bound
+    pub min_y: f64,
+    // Y-axis upper bound
+    pub max_y: f64,
+    // Z-axis lower bound
+    pub min_z: f64,
+    // Z-axis upper bound
+    pub max_z: f64,
+}
