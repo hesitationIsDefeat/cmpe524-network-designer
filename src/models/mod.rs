@@ -2,5 +2,6 @@
 
 pub mod geo;
 pub mod link;
+pub mod mobility;
 pub mod network;
 pub mod node;
