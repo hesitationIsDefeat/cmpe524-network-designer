@@ -1,4 +1,5 @@
 //! This file contains the required structures and relevant unit tests for the node of a network.
+use crate::models::geo::Point3D;
 
 #[derive(Debug, Clone, PartialEq)]
 /// Represents the type of a Node
@@ -7,16 +8,6 @@ pub enum NodeType {
     UAV,
     /// User (client) node
     USER,
-}
-
-/// Represents a point or a vector
-pub struct Point3D {
-    /// X-axis value
-    pub x: f64,
-    /// Y-axis value
-    pub y: f64,
-    /// Z-axis value
-    pub z: f64,
 }
 
 /// Represents the basic unit in network topology
@@ -39,7 +30,8 @@ impl Node {
     /// # Examples
     ///
     /// ```
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::geo::Point3D;
     /// let node = Node::new(0, NodeType::UAV, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,});
     /// ```
     pub fn new(
