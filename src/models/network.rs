@@ -48,7 +48,8 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
+    /// # use cmpe524_network_designer::models::geo::Point3D;
     /// let mut network = Network::new();
     /// let node = Node::new(1, NodeType::UAV, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,});
     ///
@@ -69,8 +70,9 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
+    /// # use cmpe524_network_designer::models::geo::Point3D;
     /// let mut network = Network::new();
     /// let a = network.add_node(Node::new(1, NodeType::UAV, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     /// let b = network.add_node(Node::new(2, NodeType::UAV, 100.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
@@ -91,8 +93,9 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
+    /// # use cmpe524_network_designer::models::geo::Point3D;
     /// let mut network = Network::new();
     /// let a = network.add_node(Node::new(1, NodeType::UAV, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     /// let b = network.add_node(Node::new(2, NodeType::UAV, 10.0,Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
@@ -114,8 +117,9 @@ impl Network {
     ///
     /// ```
     /// # use cmpe524_network_designer::models::network::Network;
-    /// # use cmpe524_network_designer::models::node::{Node, NodeType, Point3D};
+    /// # use cmpe524_network_designer::models::node::{Node, NodeType};
     /// # use cmpe524_network_designer::models::link::{Link, LinkType};
+    /// # use cmpe524_network_designer::models::geo::Point3D;
     /// let mut network = Network::new();
     /// let a = network.add_node(Node::new(1, NodeType::UAV, 10.0, Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
     /// let b = network.add_node(Node::new(2, NodeType::UAV, 10.0, Point3D {x: 0.0,y: 0.0,z: 0.0,}, Point3D {x: 1.0,y: 1.0,z: 0.0,}));
@@ -140,8 +144,9 @@ impl Network {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::geo::Point3D;
     use crate::models::link::{Link, LinkType};
-    use crate::models::node::{Node, NodeType, Point3D};
+    use crate::models::node::{Node, NodeType};
 
     // Helper function to create a dummy node
     fn mock_node(id: usize) -> Node {
