@@ -1,6 +1,14 @@
 //! This file contains utility code required to handle geographic functionality.
 
-/// Represents a point or a vector
+/// Represents a point or a directional vector in 3D space.
+///
+/// # Examples
+///
+/// ```
+/// # use cmpe524_network_designer::models::geo::Point3D;
+/// let uav_position = Point3D { x: 10.0, y: 50.0, z: 100.0 };
+/// assert_eq!(uav_position.z, 100.0);
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point3D {
     /// X-axis value
@@ -13,6 +21,21 @@ pub struct Point3D {
 
 impl Point3D {
     /// Calculates the 3D Euclidean distance between this point and another.
+    ///
+    /// This is primarily used to determine if two UAVs are within wireless
+    /// communication range of each other.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use cmpe524_network_designer::models::geo::Point3D;
+    /// let uav_1 = Point3D { x: 0.0, y: 0.0, z: 0.0 };
+    /// let uav_2 = Point3D { x: 3.0, y: 4.0, z: 0.0 };
+    ///
+    /// // The distance should form a standard 3-4-5 right triangle
+    /// let distance = uav_1.distance_to(&uav_2);
+    /// assert_eq!(distance, 5.0);
+    /// ```
     pub fn distance_to(&self, other: &Point3D) -> f64 {
         let dx = self.x - other.x;
         let dy = self.y - other.y;
@@ -21,20 +44,34 @@ impl Point3D {
     }
 }
 
-/// Represents bounds of a 3D area
+/// Represents the physical boundaries of the 3D simulation area.
+///
+/// This is used to ensure that generated mobility paths do not cause
+/// UAVs or users to wander outside the defined network zone.
+///
+/// # Examples
+///
+/// ```
+/// # use cmpe524_network_designer::models::geo::Bounds3D;
+/// let city_bounds = Bounds3D {
+///     min_x: -1000.0, max_x: 1000.0,
+///     min_y: -1000.0, max_y: 1000.0,
+///     min_z: 0.0,     max_z: 500.0, // Altitude limit of 500 units
+/// };
+/// ```
 #[derive(Debug, Clone, Copy)]
 pub struct Bounds3D {
-    // X-axis lower bound
+    /// X-axis lower bound
     pub min_x: f64,
-    // X-axis upper bound
+    /// X-axis upper bound
     pub max_x: f64,
-    // Y-axis lower bound
+    /// Y-axis lower bound
     pub min_y: f64,
     // Y-axis upper bound
     pub max_y: f64,
-    // Z-axis lower bound
+    /// Z-axis lower bound
     pub min_z: f64,
-    // Z-axis upper bound
+    /// Z-axis upper bound
     pub max_z: f64,
 }
 
