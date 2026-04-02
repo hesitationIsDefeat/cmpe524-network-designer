@@ -1,9 +1,25 @@
+//! Algorithms for determining the initial physical placement of UAVs.
+//!
+//! This module utilizes the Strategy Pattern via the [`PlacementStrategy`] trait.
+//! This allows the simulation to hot-swap different placement algorithms
+//! (like K-Means, Grid, or Random) depending on the selected configuration.
+
 use crate::models::geo::{Bounds3D, Point3D};
 use rand::seq::SliceRandom;
 
 /// The common interface for all UAV placement algorithms.
 pub trait PlacementStrategy {
     /// Calculates the optimal starting positions for a set of UAVs.
+    ///
+    /// # Arguments
+    ///
+    /// * `uav_count` - The number of UAVs available to deploy.
+    /// * `users` - A slice containing the initial physical locations of all users.
+    /// * `bounds` - The physical boundaries of the simulation space.
+    ///
+    /// # Returns
+    ///
+    /// A vector of `Point3D` representing the starting coordinates for each UAV.
     fn generate_positions(
         &self,
         uav_count: usize,
@@ -14,6 +30,30 @@ pub trait PlacementStrategy {
 
 /// A placement strategy that uses K-Means clustering to group users
 /// and places a UAV at the geographic center of each cluster.
+///
+/// This approach minimizes the initial distance between users and their
+/// closest UAV, which generally improves signal strength and reduces latency.
+///
+/// # Examples
+///
+/// ```
+/// # use cmpe524_network_designer::models::geo::{Bounds3D, Point3D};
+/// # use cmpe524_network_designer::algorithms::placement::{KMeansPlacement, PlacementStrategy};
+/// let users = vec![
+///     Point3D { x: 0.0, y: 0.0, z: 0.0 },
+///     Point3D { x: 10.0, y: 10.0, z: 0.0 },
+/// ];
+/// let bounds = Bounds3D { min_x: 0.0, max_x: 100.0, min_y: 0.0, max_y: 100.0, min_z: 0.0, max_z: 50.0 };
+///
+/// let strategy = KMeansPlacement {
+///     max_iterations: 100,
+///     target_altitude: 50.0,
+/// };
+///
+/// let uav_positions = strategy.generate_positions(2, &users, &bounds);
+/// assert_eq!(uav_positions.len(), 2);
+/// assert_eq!(uav_positions[0].z, 50.0); // Verifies target altitude
+/// ```
 pub struct KMeansPlacement {
     /// The maximum number of times the algorithm will adjust positions before giving up.
     pub max_iterations: usize,
