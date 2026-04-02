@@ -155,3 +155,127 @@ impl PlacementStrategy for KMeansPlacement {
         centroids
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn mock_bounds() -> Bounds3D {
+        Bounds3D {
+            min_x: 0.0,
+            max_x: 100.0,
+            min_y: 0.0,
+            max_y: 100.0,
+            min_z: 0.0,
+            max_z: 100.0,
+        }
+    }
+
+    #[test]
+    fn test_zero_uavs() {
+        let strategy = KMeansPlacement {
+            max_iterations: 10,
+            target_altitude: 50.0,
+        };
+        let users = vec![Point3D {
+            x: 10.0,
+            y: 10.0,
+            z: 0.0,
+        }];
+
+        let positions = strategy.generate_positions(0, &users, &mock_bounds());
+        assert!(
+            positions.is_empty(),
+            "Should return empty vector when 0 UAVs are requested"
+        );
+    }
+
+    #[test]
+    fn test_more_uavs_than_users() {
+        let strategy = KMeansPlacement {
+            max_iterations: 10,
+            target_altitude: 75.0,
+        };
+        let users = vec![
+            Point3D {
+                x: 10.0,
+                y: 10.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 20.0,
+                y: 20.0,
+                z: 0.0,
+            },
+        ];
+
+        // Request 5 UAVs for only 2 users
+        let positions = strategy.generate_positions(5, &users, &mock_bounds());
+
+        assert_eq!(
+            positions.len(),
+            2,
+            "Should only place as many UAVs as there are users"
+        );
+        assert_eq!(
+            positions[0].z, 75.0,
+            "Altitude should be forced to target_altitude"
+        );
+        assert_eq!(positions[1].z, 75.0);
+    }
+
+    #[test]
+    fn test_kmeans_clustering_logic() {
+        let strategy = KMeansPlacement {
+            max_iterations: 100,
+            target_altitude: 50.0,
+        };
+
+        // Group 1 is centered at (0, 0)
+        // Group 2 is centered at (100, 100)
+        let users = vec![
+            Point3D {
+                x: -2.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 2.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 98.0,
+                y: 100.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 102.0,
+                y: 100.0,
+                z: 0.0,
+            },
+        ];
+
+        let positions = strategy.generate_positions(2, &users, &mock_bounds());
+
+        assert_eq!(positions.len(), 2);
+
+        // K-Means should perfectly identify the centers of these two clusters
+        // Because of the random initial state, we don't know if positions[0] is Group 1 or Group 2
+        let has_group_1 = positions
+            .iter()
+            .any(|p| p.x == 0.0 && p.y == 0.0 && p.z == 50.0);
+        let has_group_2 = positions
+            .iter()
+            .any(|p| p.x == 100.0 && p.y == 100.0 && p.z == 50.0);
+
+        assert!(
+            has_group_1,
+            "Failed to find the center of cluster 1 at (0,0)"
+        );
+        assert!(
+            has_group_2,
+            "Failed to find the center of cluster 2 at (100,100)"
+        );
+    }
+}
