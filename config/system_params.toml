@@ -1,0 +1,25 @@
+# System and Hardware Parameters
+uav_amount = 5
+bandwidth_user_uav_mbps = 20.0
+bandwidth_uav_uav_mbps = 100.0
+uav_computation_capacity_ghz = 3.0
+uav_speed_m_s = 15.0
+uav_connection_limit = 50
+
+[area]
+width = 1000.0
+height = 1000.0
+
+[energy_usage]
+# Values represented in Watts (W)
+transmission = 0.5
+computation = 1.2
+move = 25.0
+stall = 5.0
+
+[task_profile]
+# Standard task requirements
+required_cycles = 1_000_000_000
+data_size_mb = 2.5
+# Average requests sent per user, per second
+requests_per_second = 0.5
