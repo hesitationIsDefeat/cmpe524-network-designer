@@ -1,0 +1,5 @@
+# Optimization Constraints
+max_delay_tolerance_seconds = 1.5
+
+# Represented as a ratio (e.g., 0.95 = 95% minimum success rate)
+min_overall_success_rate = 0.95
