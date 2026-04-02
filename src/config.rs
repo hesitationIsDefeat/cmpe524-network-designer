@@ -50,6 +50,16 @@ pub struct Constraints {
     pub min_overall_success_rate: f64,
 }
 
+// ==========================================
+// 3. Initial Users (Parsed from JSON)
+// ==========================================
+#[derive(Debug, Deserialize)]
+pub struct InitialUser {
+    pub id: u32,
+    pub x: f64,
+    pub y: f64,
+}
+
 pub fn load_system_params<P: AsRef<Path>>(path: P) -> SystemParams {
     let content =
         fs::read_to_string(path).expect("Failed to read system_params.toml. Does the file exist?");
@@ -60,4 +70,9 @@ pub fn load_system_params<P: AsRef<Path>>(path: P) -> SystemParams {
 pub fn load_constraints<P: AsRef<Path>>(path: P) -> Constraints {
     let content = fs::read_to_string(path).expect("Failed to read constraints.toml.");
     toml::from_str(&content).expect("Failed to parse constraints.toml.")
+}
+
+pub fn load_initial_users<P: AsRef<Path>>(path: P) -> Vec<InitialUser> {
+    let content = fs::read_to_string(path).expect("Failed to read initial_users.json.");
+    serde_json::from_str(&content).expect("Failed to parse initial_users.json.")
 }
