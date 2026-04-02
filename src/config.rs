@@ -40,3 +40,10 @@ pub struct TaskProfileConfig {
     pub data_size_mb: f64,
     pub requests_per_second: f64,
 }
+
+pub fn load_system_params<P: AsRef<Path>>(path: P) -> SystemParams {
+    let content =
+        fs::read_to_string(path).expect("Failed to read system_params.toml. Does the file exist?");
+    toml::from_str(&content)
+        .expect("Failed to parse system_params.toml. Check for formatting errors.")
+}
