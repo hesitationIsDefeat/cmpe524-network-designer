@@ -41,9 +41,23 @@ pub struct TaskProfileConfig {
     pub requests_per_second: f64,
 }
 
+// ==========================================
+// 2. Constraints (Parsed from TOML)
+// ==========================================
+#[derive(Debug, Deserialize)]
+pub struct Constraints {
+    pub max_delay_tolerance_seconds: f64,
+    pub min_overall_success_rate: f64,
+}
+
 pub fn load_system_params<P: AsRef<Path>>(path: P) -> SystemParams {
     let content =
         fs::read_to_string(path).expect("Failed to read system_params.toml. Does the file exist?");
     toml::from_str(&content)
         .expect("Failed to parse system_params.toml. Check for formatting errors.")
+}
+
+pub fn load_constraints<P: AsRef<Path>>(path: P) -> Constraints {
+    let content = fs::read_to_string(path).expect("Failed to read constraints.toml.");
+    toml::from_str(&content).expect("Failed to parse constraints.toml.")
 }
