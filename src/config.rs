@@ -109,3 +109,78 @@ pub fn load_initial_users<P: AsRef<Path>>(path: P) -> Vec<InitialUser> {
     let content = fs::read_to_string(path).expect("Failed to read initial_users.json.");
     serde_json::from_str(&content).expect("Failed to parse initial_users.json.")
 }
+
+// ==========================================
+// Tests
+// ==========================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_system_params() {
+        // Using a raw string literal to simulate the TOML file content
+        let toml_content = r#"
+            uav_amount = 5
+            bandwidth_user_uav_mbps = 20.0
+            bandwidth_uav_uav_mbps = 100.0
+            uav_computation_capacity_ghz = 3.0
+            uav_speed_m_s = 15.0
+            uav_connection_limit = 50
+
+            [area]
+            width = 1000.0
+            height = 1000.0
+
+            [energy_usage]
+            transmission = 0.5
+            computation = 1.2
+            move = 25.0
+            stall = 5.0
+
+            [task_profile]
+            required_cycles = 1000000000
+            data_size_mb = 2.5
+            requests_per_second = 0.5
+        "#;
+
+        // Test that it parses without panicking
+        let params: SystemParams = toml::from_str(toml_content).unwrap();
+
+        // Verify specific fields
+        assert_eq!(params.uav_amount, 5);
+        assert_eq!(params.area.width, 1000.0);
+
+        // Critically: Verify the Serde rename worked!
+        // The TOML says "move", but our struct says "movement"
+        assert_eq!(params.energy_usage.movement, 25.0);
+    }
+
+    #[test]
+    fn test_parse_constraints() {
+        let toml_content = r#"
+            max_delay_tolerance_seconds = 1.5
+            min_overall_success_rate = 0.95 
+        "#;
+
+        let constraints: Constraints = toml::from_str(toml_content).unwrap();
+        assert_eq!(constraints.max_delay_tolerance_seconds, 1.5);
+        assert_eq!(constraints.min_overall_success_rate, 0.95);
+    }
+
+    #[test]
+    fn test_parse_initial_users() {
+        let json_content = r#"
+        [
+            { "id": 1, "x": 150.5, "y": 200.0 },
+            { "id": 2, "x": 450.0, "y": 800.2 }
+        ]
+        "#;
+
+        let users: Vec<InitialUser> = serde_json::from_str(json_content).unwrap();
+        assert_eq!(users.len(), 2);
+        assert_eq!(users[0].id, 1);
+        assert_eq!(users[1].y, 800.2);
+    }
+}
