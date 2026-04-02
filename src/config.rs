@@ -1,0 +1,42 @@
+use serde::Deserialize;
+use std::fs;
+use std::path::Path;
+
+// ==========================================
+// 1. System Parameters (Parsed from TOML)
+// ==========================================
+#[derive(Debug, Deserialize)]
+pub struct SystemParams {
+    pub uav_amount: usize,
+    pub bandwidth_user_uav_mbps: f64,
+    pub bandwidth_uav_uav_mbps: f64,
+    pub uav_computation_capacity_ghz: f64,
+    pub uav_speed_m_s: f64,
+    pub uav_connection_limit: usize,
+    pub area: AreaConfig,
+    pub energy_usage: EnergyUsageConfig,
+    pub task_profile: TaskProfileConfig,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AreaConfig {
+    pub width: f64,
+    pub height: f64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EnergyUsageConfig {
+    pub transmission: f64,
+    pub computation: f64,
+    // 'move' is a reserved keyword in Rust, so we rename it during parsing
+    #[serde(rename = "move")]
+    pub movement: f64,
+    pub stall: f64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TaskProfileConfig {
+    pub required_cycles: u64,
+    pub data_size_mb: f64,
+    pub requests_per_second: f64,
+}
