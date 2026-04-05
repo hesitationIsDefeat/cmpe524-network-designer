@@ -75,6 +75,19 @@ pub struct Bounds3D {
     pub max_z: f64,
 }
 
+impl Bounds3D {
+    pub fn from_width_height(width: f64, height: f64) -> Self {
+        Self {
+            min_x: 0.0,
+            max_x: width,
+            min_y: 0.0,
+            max_y: height,
+            min_z: 0.0,
+            max_z: 0.0,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
