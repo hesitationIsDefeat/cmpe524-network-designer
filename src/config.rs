@@ -4,6 +4,7 @@
 //! state data from external TOML and JSON files, converting them into strongly
 //! typed Rust structs for use in the main simulation loop.
 
+use cmpe524_network_designer::models::geo::Bounds3D;
 use serde::Deserialize;
 use std::fs;
 use std::path::Path;
@@ -40,6 +41,12 @@ pub struct SystemParams {
 pub struct AreaConfig {
     pub width: f64,
     pub height: f64,
+}
+
+impl AreaConfig {
+    pub fn to_bounds3d(&self) -> Bounds3D {
+        Bounds3D::from_width_height(self.width, self.height)
+    }
 }
 
 /// Defines the energy costs (in Watts or Joules) for different UAV actions.
