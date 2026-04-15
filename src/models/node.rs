@@ -55,6 +55,7 @@ impl Node {
     pub fn new(
         id: usize,
         node_type: NodeType,
+        // TODO: Remove capacity and move to UAV
         capacity: f64,
         location: Point3D,
         velocity: Point3D,
