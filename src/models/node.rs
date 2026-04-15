@@ -69,6 +69,109 @@ impl Node {
     }
 }
 
+/// Represents a ground user generating computational tasks.
+#[derive(Debug, Clone)]
+pub struct User {
+    /// The base physical identity of the user.
+    pub base: Node,
+    /// The ID of the UAV this user is currently associated with (if any).
+    pub connected_uav_id: Option<usize>,
+}
+
+impl User {
+    /// Creates a new User with zero initial velocity and no connection.
+    pub fn new(id: usize, location: Point3D) -> Self {
+        Self {
+            base: Node::new(
+                id,
+                NodeType::USER,
+                0.0,
+                location,
+                Point3D {
+                    x: 0.0,
+                    y: 0.0,
+                    z: 0.0,
+                },
+            ),
+            connected_uav_id: None,
+        }
+    }
+
+    /// Generates a new task based on the user's current state.
+    pub fn generate_task(
+        &self,
+        task_id: usize,
+        current_time: f64,
+        data_size_mb: f64,
+        required_cycles: u64,
+        delay_tolerance: f64,
+    ) -> Task {
+        Task {
+            id: task_id,
+            user_id: self.base.id, // Accessing the base Node's ID
+            data_size_mb,
+            required_cycles,
+            max_delay_tolerance_seconds: delay_tolerance,
+            generated_at_time: current_time,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Uav {
+    /// The base physical identity of the UAV.
+    pub base: Node,
+    /// Maximum work capacity (e.g., in GHz).
+    pub capacity: f64,
+    /// IDs of connected ground users.
+    pub connected_users: Vec<usize>,
+    /// The queue of tasks currently waiting to be processed.
+    pub task_queue: Vec<Task>,
+    /// The amount of capacity currently being utilized.
+    pub current_load: f64,
+    /// Total energy consumed by this UAV so far (in Joules or Watts).
+    pub energy_consumed: f64,
+}
+
+impl Uav {
+    /// Creates a new UAV with specific capacity and velocity.
+    pub fn new(id: usize, capacity: f64, location: Point3D, velocity: Point3D) -> Self {
+        Self {
+            base: Node::new(id, NodeType::UAV, capacity, location, velocity),
+            capacity,
+            connected_users: Vec::new(),
+            task_queue: Vec::new(),
+            current_load: 0.0,
+            energy_consumed: 0.0,
+        }
+    }
+
+    /// Checks remaining processing capacity.
+    pub fn available_capacity(&self) -> f64 {
+        let available = self.capacity - self.current_load;
+        if available < 0.0 { 0.0 } else { available }
+    }
+
+    /// Estimates the queuing delay for incoming tasks based on current queue length.
+    pub fn estimate_queue_delay(&self) -> f64 {
+        if self.capacity == 0.0 {
+            return f64::MAX;
+        }
+
+        // Convert capacity (assuming GHz from config) to raw cycles per second
+        let cycles_per_second = self.capacity * 1_000_000_000.0;
+
+        // Sum all pending cycles in the queue
+        let total_pending_cycles: u64 = self.task_queue.iter().map(|t| t.required_cycles).sum();
+
+        if total_pending_cycles == 0 {
+            0.0
+        } else {
+            total_pending_cycles as f64 / cycles_per_second
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
