@@ -107,3 +107,133 @@ impl AssociationStrategy for IlpAssociation {
         Ok(binary_matrix)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_association_by_distance() {
+        let strategy = IlpAssociation;
+
+        let users = vec![
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 100.0,
+                y: 100.0,
+                z: 0.0,
+            },
+        ];
+        let uavs = vec![
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 50.0,
+            },
+            Point3D {
+                x: 100.0,
+                y: 100.0,
+                z: 50.0,
+            },
+        ];
+
+        let result = strategy.associate(&users, &uavs, 5).unwrap();
+
+        assert!(result[0][0]);
+        assert!(!result[0][1]);
+
+        assert!(!result[1][0]);
+        assert!(result[1][1]);
+    }
+
+    #[test]
+    fn test_capacity_overflow_forces_suboptimal_distance() {
+        let strategy = IlpAssociation;
+
+        let users = vec![
+            Point3D {
+                x: 1.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 2.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Point3D {
+                x: 3.0,
+                y: 0.0,
+                z: 0.0,
+            },
+        ];
+
+        let uavs = vec![
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 50.0,
+            },
+            Point3D {
+                x: 100.0,
+                y: 0.0,
+                z: 50.0,
+            },
+        ];
+
+        let result = strategy.associate(&users, &uavs, 2).unwrap();
+
+        let uav_0_connections = result.iter().filter(|user| user[0]).count();
+        let uav_1_connections = result.iter().filter(|user| user[1]).count();
+
+        assert_eq!(
+            uav_0_connections, 2,
+            "UAV 0 should be perfectly maxed out at 2 users"
+        );
+        assert_eq!(
+            uav_1_connections, 1,
+            "The 3rd user must be forced to the distant UAV 1 due to capacity limits"
+        );
+    }
+
+    #[test]
+    fn test_infeasible_network_capacity() {
+        let strategy = IlpAssociation;
+
+        let users = vec![
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0
+            };
+            5
+        ];
+
+        let uavs = vec![
+            Point3D {
+                x: 0.0,
+                y: 0.0,
+                z: 50.0
+            };
+            2
+        ];
+
+        let result = strategy.associate(&users, &uavs, 2);
+
+        assert!(
+            result.is_err(),
+            "Should return an Err when users exceed total network capacity"
+        );
+    }
+
+    #[test]
+    fn test_empty_network_safe_handling() {
+        let strategy = IlpAssociation;
+        let result = strategy.associate(&vec![], &vec![], 5).unwrap();
+        assert!(result.is_empty());
+    }
+}
