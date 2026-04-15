@@ -1,14 +1,19 @@
 # System and Hardware Parameters
-uav_amount = 5
+uav_amount = 20
 bandwidth_user_uav_mbps = 20.0
 bandwidth_uav_uav_mbps = 100.0
 uav_computation_capacity_ghz = 3.0
 uav_speed_m_s = 15.0
-uav_connection_limit = 50
+uav_connection_limit = 5
 
 [area]
 width = 1000.0
 height = 1000.0
+
+[users]
+# If true, generates locations; else, uses initial_users.json to parse locations
+auto_generate_loc = true
+user_amount = 100
 
 [energy_usage]
 # Values represented in Watts (W)
