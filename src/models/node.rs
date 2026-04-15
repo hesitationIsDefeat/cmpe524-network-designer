@@ -27,6 +27,7 @@ pub enum NodeType {
     USER,
 }
 
+#[derive(Debug, Clone)]
 /// Represents the basic unit in network topology
 pub struct Node {
     /// Unique identifier
