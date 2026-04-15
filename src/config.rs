@@ -148,6 +148,10 @@ mod tests {
             width = 1000.0
             height = 1000.0
 
+            [user]
+            auto_generate = true
+            user_amount = 5
+
             [energy_usage]
             transmission = 0.5
             computation = 1.2
