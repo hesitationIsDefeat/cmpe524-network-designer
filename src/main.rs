@@ -4,6 +4,7 @@ use cmpe524_network_designer::algorithms::placement::KMeansPlacement;
 use cmpe524_network_designer::algorithms::placement::PlacementStrategy;
 use cmpe524_network_designer::models::geo::Bounds3D;
 use cmpe524_network_designer::models::geo::Point3D;
+use cmpe524_network_designer::models::node::{Uav, User};
 use rand::Rng;
 
 fn main() {
@@ -89,10 +90,35 @@ fn main() {
     ) {
         Ok(association_matrix) => {
             println!("✅ Association successful!");
+            let mut users: Vec<User> = user_points
+                .iter()
+                .enumerate()
+                .map(|(idx, &loc)| User::new(idx + 1, loc))
+                .collect();
+
+            let mut uavs: Vec<Uav> = uav_starting_positions
+                .iter()
+                .enumerate()
+                .map(|(idx, &loc)| {
+                    Uav::new(
+                        idx + 1,
+                        system_params.uav_computation_capacity_ghz,
+                        loc,
+                        Point3D {
+                            x: 0.0,
+                            y: 0.0,
+                            z: 0.0,
+                        },
+                    )
+                })
+                .collect();
+
             for (user_idx, uav_links) in association_matrix.iter().enumerate() {
                 for (uav_idx, &is_connected) in uav_links.iter().enumerate() {
                     if is_connected {
-                        // User IDs often start at 1 in configs, so we use the actual config ID for clarity
+                        users[user_idx].connected_uav_id = Some(uavs[uav_idx].base.id);
+                        uavs[uav_idx].connected_users.push(users[user_idx].base.id);
+
                         println!(
                             "   User [{:02}] -> connected to -> UAV [{:02}]",
                             user_idx + 1,
@@ -101,6 +127,13 @@ fn main() {
                     }
                 }
             }
+
+            println!("\n📊 Network State Initialized.");
+            println!(
+                "   Tracking {} stateful Users and {} stateful UAVs.",
+                users.len(),
+                uavs.len()
+            );
         }
         Err(e) => {
             println!("❌ Association failed: {}", e);
