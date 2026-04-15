@@ -49,6 +49,12 @@ impl AreaConfig {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UsersConfig {
+    pub auto_generate: bool,
+    pub amount: usize,
+}
+
 /// Defines the energy costs (in Watts or Joules) for different UAV actions.
 #[derive(Debug, Deserialize)]
 pub struct EnergyUsageConfig {
