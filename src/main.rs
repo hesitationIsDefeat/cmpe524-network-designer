@@ -1,4 +1,5 @@
 pub mod config;
+use cmpe524_network_designer::algorithms::association::{AssociationStrategy, IlpAssociation};
 use cmpe524_network_designer::algorithms::placement::KMeansPlacement;
 use cmpe524_network_designer::algorithms::placement::PlacementStrategy;
 use cmpe524_network_designer::models::geo::Bounds3D;
@@ -51,5 +52,35 @@ fn main() {
             pos.y,
             pos.z
         );
+    }
+
+    // 5. Initialize and Run ILP Association Strategy
+    println!("\n🔗 Calculating optimal ILP User-UAV Association...");
+    let association_strategy = IlpAssociation;
+
+    // We pass the calculated UAV positions and the raw user points into the solver
+    match association_strategy.associate(
+        &user_points,
+        &uav_starting_positions,
+        system_params.uav_connection_limit,
+    ) {
+        Ok(association_matrix) => {
+            println!("✅ Association successful!");
+            for (user_idx, uav_links) in association_matrix.iter().enumerate() {
+                for (uav_idx, &is_connected) in uav_links.iter().enumerate() {
+                    if is_connected {
+                        // User IDs often start at 1 in configs, so we use the actual config ID for clarity
+                        println!(
+                            "   User [{:02}] -> connected to -> UAV [{:02}]",
+                            initial_users[user_idx].id,
+                            uav_idx + 1
+                        );
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            println!("❌ Association failed: {}", e);
+        }
     }
 }
