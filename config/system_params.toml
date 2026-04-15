@@ -10,9 +10,9 @@ uav_connection_limit = 5
 width = 1000.0
 height = 1000.0
 
-[users]
+[user]
 # If true, generates locations; else, uses initial_users.json to parse locations
-auto_generate_loc = true
+auto_generate = true
 user_amount = 100
 
 [energy_usage]
