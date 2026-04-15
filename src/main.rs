@@ -4,31 +4,54 @@ use cmpe524_network_designer::algorithms::placement::KMeansPlacement;
 use cmpe524_network_designer::algorithms::placement::PlacementStrategy;
 use cmpe524_network_designer::models::geo::Bounds3D;
 use cmpe524_network_designer::models::geo::Point3D;
+use rand::Rng;
 
 fn main() {
     println!("Loading Configuration...");
 
     let system_params = config::load_system_params("config/system_params.toml");
     let constraints = config::load_constraints("config/constraints.toml");
-    let initial_users = config::load_initial_users("config/initial_users.json");
 
     println!("✅ Loaded {} UAVs.", system_params.uav_amount);
     println!(
         "✅ Target Success Rate: {}%",
         constraints.min_overall_success_rate * 100.0
     );
-    println!("✅ Loaded {} Users.", initial_users.len());
 
-    let user_points: Vec<Point3D> = initial_users
-        .iter()
-        .map(|u| Point3D {
-            x: u.x,
-            y: u.y,
-            z: 0.0,
-        })
-        .collect();
+    let user_points: Vec<Point3D>;
 
     let bounds: Bounds3D = system_params.area.to_bounds3d();
+
+    if system_params.user.auto_generate {
+        println!(
+            "🎲 Auto-generating {} random user locations...",
+            system_params.user.user_amount
+        );
+        let mut rng = rand::thread_rng();
+        let mut generated_users = Vec::with_capacity(system_params.user.user_amount);
+
+        for _ in 0..system_params.user.user_amount {
+            generated_users.push(Point3D {
+                x: rng.gen_range(0.0..system_params.area.width),
+                y: rng.gen_range(0.0..system_params.area.height),
+                z: 0.0, // Ground users stay at altitude 0
+            });
+        }
+        user_points = generated_users;
+        println!("✅ Generated {} Users.", user_points.len());
+    } else {
+        let initial_users = config::load_initial_users("config/initial_users.json");
+        println!("✅ Loaded {} Ground Users from JSON.", initial_users.len());
+        user_points = initial_users
+            .iter()
+            .map(|u| Point3D {
+                x: u.x,
+                y: u.y,
+                z: 0.0,
+            })
+            .collect();
+        println!("✅ Loaded {} Users.", initial_users.len());
+    }
 
     let strategy = KMeansPlacement {
         max_iterations: 100,
@@ -72,7 +95,7 @@ fn main() {
                         // User IDs often start at 1 in configs, so we use the actual config ID for clarity
                         println!(
                             "   User [{:02}] -> connected to -> UAV [{:02}]",
-                            initial_users[user_idx].id,
+                            user_idx + 1,
                             uav_idx + 1
                         );
                     }
