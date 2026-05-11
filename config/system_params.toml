@@ -27,4 +27,8 @@ stall = 5.0
 required_cycles = 1_000_000_000
 data_size_mb = 2.5
 # Average requests sent per user, per second
-requests_per_second = 0.5
+requests_per_second = 1
+
+[simulation]
+# Simulation duration
+simulation_duration = 600
