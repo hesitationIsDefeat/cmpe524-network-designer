@@ -1,4 +1,5 @@
 pub mod config;
+pub mod simulation;
 use cmpe524_network_designer::algorithms::association::{AssociationStrategy, IlpAssociation};
 use cmpe524_network_designer::algorithms::placement::KMeansPlacement;
 use cmpe524_network_designer::algorithms::placement::PlacementStrategy;
