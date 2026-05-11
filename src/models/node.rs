@@ -16,6 +16,8 @@ pub struct Task {
     pub max_delay_tolerance_seconds: f64,
     /// The exact simulation time this task was created.
     pub generated_at_time: f64,
+    /// When the task will actually finish processing
+    pub completed_at_time: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -114,6 +116,7 @@ impl User {
             required_cycles,
             max_delay_tolerance_seconds: delay_tolerance,
             generated_at_time: current_time,
+            completed_at_time: None,
         }
     }
 }
