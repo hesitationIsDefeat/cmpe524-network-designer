@@ -10,3 +10,4 @@ serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 serde_json = "1.0"
 good_lp = { version = "1.7.0", features = ["coin_cbc"] }
+rand_distr = "0.4"
