@@ -134,6 +134,36 @@ fn main() {
                 users.len(),
                 uavs.len()
             );
+
+            println!("\n=========================================");
+            let final_metrics = simulation::run_event_driven_simulation(
+                &system_params,
+                &constraints,
+                &mut users,
+                &mut uavs,
+            );
+
+            println!("\n🏁 Simulation Complete!");
+            println!(
+                "   Total Tasks Processed : {}",
+                final_metrics.total_tasks_generated
+            );
+            println!(
+                "   Success Rate          : {:.2}%",
+                final_metrics.success_rate() * 100.0
+            );
+            println!(
+                "   Average Delay         : {:.4} seconds",
+                final_metrics.average_delay()
+            );
+
+            println!("\n🔋 Final UAV Energy States:");
+            for uav in uavs.iter() {
+                println!(
+                    "   UAV [{:02}]: {:.2} Joules consumed",
+                    uav.base.id, uav.energy_consumed
+                );
+            }
         }
         Err(e) => {
             println!("❌ Association failed: {}", e);
